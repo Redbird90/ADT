@@ -14,17 +14,24 @@ import android.widget.TextView;
 
 public class MainActivity extends ActionBarActivity {
 
+    long millisRemaining;
+    CountDownTimer countDownTimer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         final TextView textViewTimer = (TextView) findViewById(R.id.textView);
+        final TextView textViewProgress = (TextView) findViewById(R.id.textView2);
 
-        final CountDownTimer countDownTimer = new CountDownTimer(5000, 1000) {
+        countDownTimer = new CountDownTimer(5000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
+                millisRemaining = millisUntilFinished;
                 String prefix = "Time Remaining: ";
                 textViewTimer.setText(prefix + millisUntilFinished / 1000);
+                textViewProgress.setText("Assembly In Progress... Please Stand By");
             }
 
             @Override
@@ -35,30 +42,53 @@ public class MainActivity extends ActionBarActivity {
             }
         };
 
-        Button startButton = (Button) findViewById(R.id.buttonStart);
+        final Button pauseButton = (Button) findViewById(R.id.buttonPause);
+
+        final Button startButton = (Button) findViewById(R.id.buttonStart);
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 countDownTimer.start();
+                startButton.setEnabled(false);
+                pauseButton.setEnabled(true);
             }
         });
 
-        final Button pauseButton = (Button) findViewById(R.id.buttonPause);
+
+        pauseButton.setEnabled(false);
         pauseButton.setOnClickListener(new View.OnClickListener() {
+
             boolean paused;
+
             @Override
             public void onClick(View v) {
-                try {
-                    countDownTimer.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 if (paused) {
-                pauseButton.setText("Resume");
+                    paused = false;
+                    pauseButton.setText("Pause");
+                    countDownTimer = new CountDownTimer(millisRemaining, 1000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            millisRemaining = millisUntilFinished;
+                            String prefix = "Time Remaining: ";
+                            textViewTimer.setText(prefix + millisUntilFinished / 1000);
+                            textViewProgress.setText("Assembly In Progress... Please Stand By");
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            Context context = getApplicationContext();
+                            Intent intent = new Intent(context, SecondaryActivity.class);
+                            startActivity(intent);
+                        }
+                    };
+                    countDownTimer.start();
+                } else {
+                    paused = true;
+                    pauseButton.setText("Resume");
+                    countDownTimer.cancel();
+                }
             }
         });
-
-        setContentView(R.layout.activity_main);
     }
 
     @Override

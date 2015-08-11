@@ -11,6 +11,16 @@
     <TextView
         android:text="Assembly Complete!"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:id="@+id/textView3"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Return to Assembly Countdown"
+        android:id="@+id/buttonReturn"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>
